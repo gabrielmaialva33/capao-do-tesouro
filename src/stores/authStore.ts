@@ -21,14 +21,19 @@ export const useAuthStore = create<AuthState>((set) => ({
   error: null,
   isAuthenticated: false,
 
-  setUser: (user: User | null) =>
+  setUser: (user: User | null) => {
+    console.log('setUser called:', { user: user ? 'exists' : 'null', willSetLoading: false });
     set({
       user,
       isAuthenticated: !!user,
       loading: false,
-    }),
+    });
+  },
 
-  setLoading: (loading: boolean) => set({ loading }),
+  setLoading: (loading: boolean) => {
+    console.log('setLoading called:', loading);
+    set({ loading });
+  },
 
   setError: (error: string | null) => set({ error }),
 
