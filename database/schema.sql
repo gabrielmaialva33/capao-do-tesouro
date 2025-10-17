@@ -54,6 +54,15 @@ CREATE TABLE locations (
 SELECT AddGeometryColumn('locations', 'geom', 4326, 'POINT', 2);
 UPDATE locations SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326);
 
+-- Add AI-enhanced fields
+ALTER TABLE locations ADD COLUMN IF NOT EXISTS ai_refined_coordinates GEOMETRY(POINT, 4326);
+ALTER TABLE locations ADD COLUMN IF NOT EXISTS confidence_score DECIMAL(3,2) CHECK (confidence_score >= 0 AND confidence_score <= 1);
+ALTER TABLE locations ADD COLUMN IF NOT EXISTS cultural_context TEXT;
+ALTER TABLE locations ADD COLUMN IF NOT EXISTS historical_facts JSONB;
+ALTER TABLE locations ADD COLUMN IF NOT EXISTS visitor_tips JSONB;
+ALTER TABLE locations ADD COLUMN IF NOT EXISTS last_ai_update TIMESTAMPTZ;
+ALTER TABLE locations ADD COLUMN IF NOT EXISTS ai_enhanced_description TEXT;
+
 -- Indexes for locations table
 CREATE INDEX idx_locations_category ON locations(category);
 CREATE INDEX idx_locations_geom ON locations USING GIST(geom);

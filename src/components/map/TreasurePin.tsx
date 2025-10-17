@@ -13,6 +13,7 @@ export interface TreasureLocation {
   description: string;
   points: number;
   discovered?: boolean;
+  confidence?: number;
 }
 
 /**

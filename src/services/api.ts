@@ -4,6 +4,7 @@
  */
 
 import type { Location, CheckIn, CheckInResponse, UserProgress, LeaderboardUser, Badge } from '../types/game';
+import { enhanceLocation } from './locationAI';
 
 // Mock delay to simulate API calls
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -188,17 +189,43 @@ function pointsForNextLevel(currentLevel: number): number {
 }
 
 /**
- * Fetch all available locations
+ * Fetch all available locations with AI enhancement
  */
-export async function fetchLocations(): Promise<Location[]> {
+export async function fetchLocations(enhanceWithAI: boolean = false): Promise<Location[]> {
   await delay(500);
 
   // In production, replace with:
   // const response = await fetch('/api/locations');
   // if (!response.ok) throw new Error('Failed to fetch locations');
-  // return response.json();
+  // const locations = await response.json();
 
-  return MOCK_LOCATIONS;
+  let locations = MOCK_LOCATIONS;
+
+  // Apply AI enhancement if requested
+  if (enhanceWithAI) {
+    try {
+      const enhancedLocations = await Promise.all(
+        locations.map(async (location) => {
+          const enhancement = await enhanceLocation(location);
+          return {
+            ...location,
+            aiRefinedCoordinates: enhancement.refinedCoordinates,
+            confidenceScore: enhancement.confidenceScore,
+            culturalContext: enhancement.culturalContext,
+            historicalFacts: enhancement.historicalFacts,
+            visitorTips: enhancement.visitorTips,
+            aiEnhancedDescription: enhancement.enhancedDescription,
+            lastAiUpdate: new Date(),
+          };
+        })
+      );
+      locations = enhancedLocations;
+    } catch (error) {
+      console.warn('Failed to enhance locations with AI, returning original data:', error);
+    }
+  }
+
+  return locations;
 }
 
 /**

@@ -12,10 +12,23 @@ export interface Location {
   };
   points: number;
   radius: number; // Check-in radius in meters
-  category: 'historical' | 'nature' | 'cultural' | 'hidden';
+  category: 'historical' | 'nature' | 'cultural' | 'hidden' | 'religious' | 'museum' | 'viewpoint' | 'market';
+  address?: string;
   imageUrl?: string;
   checkedIn: boolean;
   checkinCount: number;
+  
+  // AI-enhanced fields
+  aiRefinedCoordinates?: {
+    lat: number;
+    lng: number;
+  };
+  confidenceScore?: number;
+  culturalContext?: string;
+  historicalFacts?: string[];
+  visitorTips?: string[];
+  aiEnhancedDescription?: string;
+  lastAiUpdate?: Date;
 }
 
 export interface CheckIn {

@@ -27,20 +27,21 @@ export default function MapPage() {
     loadLocations();
   }, []);
 
-  const loadLocations = async () => {
+  const loadLocations = async (useAI: boolean = true) => {
     try {
       setLoading(true);
-      const data = await fetchLocations();
+      const data = await fetchLocations(useAI);
 
       // Transform API data to TreasureLocation format
       const treasureLocations: TreasureLocation[] = data.map(loc => ({
         id: loc.id,
         name: loc.name,
-        lat: loc.coordinates.lat,
-        lng: loc.coordinates.lng,
-        description: loc.description,
+        lat: loc.aiRefinedCoordinates?.lat || loc.coordinates.lat,
+        lng: loc.aiRefinedCoordinates?.lng || loc.coordinates.lng,
+        description: loc.aiEnhancedDescription || loc.description,
         points: loc.points,
         discovered: loc.checkedIn,
+        confidence: loc.confidenceScore,
       }));
 
       setLocations(treasureLocations);
