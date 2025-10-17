@@ -27,9 +27,6 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Copy built assets from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy environment template for runtime injection
-COPY .env.example /usr/share/nginx/html/.env.example
-
 # Expose port
 EXPOSE 80
 
