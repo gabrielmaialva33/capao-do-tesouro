@@ -3,14 +3,14 @@
  * Tests AI location enhancement functionality
  */
 
-import { useState, useEffect } from 'react';
-import { Button } from '../ui/Button';
-import { Card } from '../ui/Card';
+import { useState } from 'react';
+import Button from '../ui/Button';
+import Card from '../ui/Card';
 import { enhanceLocation, validateCoordinates } from '../../services/locationAI';
 import type { Location } from '../../types/game';
 
 export default function MapIntegrationTest() {
-  const [testLocation, setTestLocation] = useState<Location>({
+  const [testLocation] = useState<Location>({
     id: 'test-001',
     name: 'Igreja Matriz Nossa Senhora da Conceicao',
     description: 'Igreja catolica historica construida no seculo XVIII',

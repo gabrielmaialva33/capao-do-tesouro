@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  capao-app:
+    container_name: capao-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - capao-network
+    labels:
+      - "com.capao-do-tesouro.description=Capao do Tesouro PWA Frontend"
+      - "com.capao-do-tesouro.version=1.0.0"
+
+networks:
+  capao-network:
+    driver: bridge
+    name: capao-network
+
+# Note: TimescaleDB is already running as bitaca-timescaledb on port 5432
+# To connect frontend to existing database, create a backend API service
+# and connect it to the external network where bitaca-timescaledb is running

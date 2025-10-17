@@ -3,7 +3,7 @@
  * Handles periodic AI enhancement of locations
  */
 
-import { fetchLocations, enhanceLocations } from './api';
+import { fetchLocations } from './api';
 import { enhanceLocation } from './locationAI';
 
 export interface JobStatus {
@@ -50,9 +50,9 @@ class BackgroundJobService {
   /**
    * Create a job to enhance all locations with low confidence scores
    */
-  async createLocationEnhancementJob(threshold: number = 0.8) {
+  async createLocationEnhancementJob() {
     const jobId = `enhance-locations-${Date.now()}`;
-    
+
     this.jobs.set(jobId, {
       id: jobId,
       name: 'Enhance Low Confidence Locations',
