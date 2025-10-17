@@ -119,6 +119,24 @@ export function TreasurePin({
 
             <p className="treasure-popup-description">{location.description}</p>
 
+            {/* Confidence indicator */}
+            {location.confidence !== undefined && (
+              <div className="treasure-popup-confidence">
+                <div className="treasure-popup-confidence-bar">
+                  <div 
+                    className="treasure-popup-confidence-fill"
+                    style={{ 
+                      width: `${location.confidence * 100}%`,
+                      backgroundColor: location.confidence > 0.8 ? '#10b981' : location.confidence > 0.6 ? '#f59e0b' : '#ef4444'
+                    }}
+                  ></div>
+                </div>
+                <div className="treasure-popup-confidence-text">
+                  Precisão: {Math.round(location.confidence * 100)}%
+                </div>
+              </div>
+            )}
+
             <div className="treasure-popup-info">
               <div className="treasure-popup-points">
                 <span className="treasure-popup-label">Pontos:</span>
