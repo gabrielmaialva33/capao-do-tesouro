@@ -4,6 +4,7 @@
  * Configures application routes and authentication flow
  */
 
+import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 
@@ -19,11 +20,13 @@ import ProfilePage from './features/auth/ProfilePage';
 
 // Protected Route Component
 import ProtectedRoute from './components/ProtectedRoute';
+import RequestLocation from './components/RequestLocation';
 
 import './App.css';
 
 function App() {
   const { isAuthenticated, loading } = useAuth();
+  const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
 
   // Show loading screen while checking authentication
   if (loading) {
@@ -39,6 +42,21 @@ function App() {
 
   return (
     <BrowserRouter>
+      {/* Request location permission for authenticated users */}
+      {isAuthenticated && !locationPermissionGranted && (
+        <RequestLocation
+          onPermissionGranted={() => {
+            console.log('Location permission granted!');
+            setLocationPermissionGranted(true);
+          }}
+          onPermissionDenied={() => {
+            console.log('Location permission denied');
+            // User pode usar app mas sem funcionalidades de localização
+            setLocationPermissionGranted(true); // Permite continuar mesmo sem permissão
+          }}
+        />
+      )}
+
       <Routes>
         {/* Public Routes */}
         <Route

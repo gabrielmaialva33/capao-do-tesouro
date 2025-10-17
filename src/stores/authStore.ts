@@ -131,7 +131,9 @@ export const authActions = {
     setLoading(true);
 
     const unsubscribe = onAuthStateChange((user) => {
+      console.log('Auth state changed:', user ? 'Logged in' : 'Logged out');
       setUser(user);
+      setLoading(false); // Sempre seta loading false após receber estado
     });
 
     return unsubscribe;
