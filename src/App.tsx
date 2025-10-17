@@ -23,6 +23,9 @@ import ProfilePage from './features/auth/ProfilePage';
 import ProtectedRoute from './components/ProtectedRoute';
 import RequestLocation from './components/RequestLocation';
 
+// Admin Page
+import AdminPage from './pages/AdminPage';
+
 import './App.css';
 
 function App() {
@@ -157,6 +160,16 @@ function App() {
                   </p>
                 </div>
               </div>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin Route */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminPage />
             </ProtectedRoute>
           }
         />
