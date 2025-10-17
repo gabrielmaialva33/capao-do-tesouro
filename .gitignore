@@ -36,3 +36,4 @@ firebase-debug.log
 !package.json
 !package-lock.json
 !tsconfig*.json
+.playwright-mcp
