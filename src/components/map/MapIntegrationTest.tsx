@@ -1,482 +1,169 @@
 /**
- * Integration test / demo component for map functionality
- *
- * This component can be used to test all map features in isolation
+ * Map Integration Test Component
+ * Tests AI location enhancement functionality
  */
 
-import { useState } from 'react';
-import { LeafletMap } from './LeafletMap';
-import { useGeolocation } from '../../hooks/useGeolocation';
-import { calculateDistance, formatDistance, isWithinRadius } from '../../lib/geolocation';
-import type { TreasureLocation } from './TreasurePin';
+import { useState, useEffect } from 'react';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+import { enhanceLocation, validateCoordinates } from '../../services/locationAI';
+import type { Location } from '../../types/game';
 
-export function MapIntegrationTest() {
-  const { position, error, loading, refetch, isWatching } = useGeolocation({ watch: true });
-  const [score, setScore] = useState(0);
-  const [checkedIn, setCheckedIn] = useState<Set<string>>(new Set());
-  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
-
-  // Test locations around Capão do Tesouro
-  const testLocations: TreasureLocation[] = [
-    {
-      id: '1',
-      name: 'Mirante do Vale',
-      lat: -14.0642,
-      lng: -41.3025,
-      description: 'Vista panorâmica incrível do Vale do Capão',
-      points: 50,
-      discovered: checkedIn.has('1'),
-    },
-    {
-      id: '2',
-      name: 'Cachoeira da Fumaça',
-      lat: -14.0891,
-      lng: -41.2875,
-      description: 'Uma das cachoeiras mais altas do Brasil, com 340m de altura',
-      points: 100,
-      discovered: checkedIn.has('2'),
-    },
-    {
-      id: '3',
-      name: 'Cachoeirão',
-      lat: -14.0701,
-      lng: -41.3142,
-      description: 'Cachoeira com grande piscina natural perfeita para banho',
-      points: 75,
-      discovered: checkedIn.has('3'),
-    },
-    {
-      id: '4',
-      name: 'Rodas',
-      lat: -14.0534,
-      lng: -41.2987,
-      description: 'Conjunto de poços cristalinos em sequência',
-      points: 60,
-      discovered: checkedIn.has('4'),
-    },
-    {
-      id: '5',
-      name: 'Riachinho',
-      lat: -14.0589,
-      lng: -41.3156,
-      description: 'Trilha leve com pequenas cachoeiras',
-      points: 40,
-      discovered: checkedIn.has('5'),
-    },
-  ];
-
-  // Calculate distances to all locations
-  const locationsWithDetails = testLocations.map(location => {
-    if (!position) {
-      return { ...location, distance: undefined, canCheckIn: false };
-    }
-
-    const distance = calculateDistance(
-      position.coords.latitude,
-      position.coords.longitude,
-      location.lat,
-      location.lng
-    );
-
-    const canCheckIn = isWithinRadius(
-      { lat: position.coords.latitude, lng: position.coords.longitude },
-      { lat: location.lat, lng: location.lng }
-    );
-
-    return {
-      ...location,
-      distance,
-      canCheckIn,
-    };
+export default function MapIntegrationTest() {
+  const [testLocation, setTestLocation] = useState<Location>({
+    id: 'test-001',
+    name: 'Igreja Matriz Nossa Senhora da Conceicao',
+    description: 'Igreja catolica historica construida no seculo XVIII',
+    coordinates: { lat: -12.4686111, lng: -41.5794444 },
+    points: 150,
+    radius: 50,
+    category: 'religious',
+    address: 'Praca da Matriz, s/n - Centro, Capao do Tesouro - BA',
+    checkedIn: false,
+    checkinCount: 0,
   });
 
-  // Handle check-in
-  const handleCheckIn = (locationId: string) => {
-    const location = testLocations.find(loc => loc.id === locationId);
-    if (!location || checkedIn.has(locationId)) return;
+  const [enhancementResult, setEnhancementResult] = useState<any>(null);
+  const [validationResult, setValidationResult] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    // Add to checked-in set
-    setCheckedIn(prev => new Set(prev).add(locationId));
-    setSelectedLocation(locationId);
-
-    // Add points
-    setScore(prev => prev + location.points);
-
-    // Celebrate!
-    console.log(`Check-in successful at ${location.name}! +${location.points} points`);
+  const handleEnhanceLocation = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await enhanceLocation(testLocation);
+      setEnhancementResult(result);
+    } catch (err) {
+      setError('Failed to enhance location: ' + (err as Error).message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Sort locations by distance
-  const sortedLocations = [...locationsWithDetails].sort((a, b) => {
-    if (a.distance === undefined) return 1;
-    if (b.distance === undefined) return -1;
-    return a.distance - b.distance;
-  });
+  const handleValidateCoordinates = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await validateCoordinates(
+        testLocation.coordinates.lat,
+        testLocation.coordinates.lng,
+        testLocation.name
+      );
+      setValidationResult(result);
+    } catch (err) {
+      setError('Failed to validate coordinates: ' + (err as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="map-test">
-      <header className="map-test-header">
-        <h1>Capão do Tesouro - Map Test</h1>
-        <div className="map-test-score">
-          <span className="score-label">Score:</span>
-          <span className="score-value">{score}</span>
+    <div className="p-6 max-w-4xl mx-auto">
+      <h1 className="text-2xl font-bold mb-6">AI Location Enhancement Test</h1>
+      
+      {error && (
+        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
         </div>
-      </header>
+      )}
 
-      <div className="map-test-grid">
-        {/* Main Map */}
-        <div className="map-test-main">
-          <LeafletMap
-            locations={testLocations.map((loc) => ({
-              ...loc,
-              discovered: checkedIn.has(loc.id),
-            }))}
-            onLocationClick={handleCheckIn}
-            zoom={13}
-            height="600px"
-          />
-        </div>
-
-        {/* Sidebar */}
-        <aside className="map-test-sidebar">
-          {/* Geolocation Status */}
-          <div className="status-card">
-            <h3>Geolocation Status</h3>
-            {loading && <p className="status-loading">Loading...</p>}
-            {error && <p className="status-error">{error}</p>}
-            {position && (
-              <div className="status-info">
-                <p>
-                  <strong>Lat:</strong> {position.coords.latitude.toFixed(6)}
-                </p>
-                <p>
-                  <strong>Lng:</strong> {position.coords.longitude.toFixed(6)}
-                </p>
-                <p>
-                  <strong>Accuracy:</strong> ±{Math.round(position.coords.accuracy)}m
-                </p>
-                <p>
-                  <strong>Watching:</strong> {isWatching ? 'Yes' : 'No'}
-                </p>
-              </div>
-            )}
-            <button className="btn-refresh" onClick={refetch}>
-              Refresh Location
-            </button>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <h2 className="text-xl font-semibold mb-4">Original Location</h2>
+          <div className="space-y-2">
+            <p><strong>Name:</strong> {testLocation.name}</p>
+            <p><strong>Coordinates:</strong> {testLocation.coordinates.lat}, {testLocation.coordinates.lng}</p>
+            <p><strong>Description:</strong> {testLocation.description}</p>
+            <p><strong>Category:</strong> {testLocation.category}</p>
+            <p><strong>Address:</strong> {testLocation.address}</p>
           </div>
+        </Card>
 
-          {/* Stats */}
-          <div className="status-card">
-            <h3>Statistics</h3>
-            <div className="stats-grid">
-              <div className="stat-item">
-                <span className="stat-value">{checkedIn.size}</span>
-                <span className="stat-label">Discovered</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-value">{testLocations.length}</span>
-                <span className="stat-label">Total</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-value">
-                  {((checkedIn.size / testLocations.length) * 100).toFixed(0)}%
-                </span>
-                <span className="stat-label">Progress</span>
-              </div>
-            </div>
+        <Card>
+          <h2 className="text-xl font-semibold mb-4">Actions</h2>
+          <div className="space-y-3">
+            <Button
+              onClick={handleEnhanceLocation}
+              disabled={loading}
+              className="w-full"
+            >
+              {loading ? 'Enhancing...' : 'Enhance Location with AI'}
+            </Button>
+            
+            <Button
+              onClick={handleValidateCoordinates}
+              disabled={loading}
+              variant="outline"
+              className="w-full"
+            >
+              {loading ? 'Validating...' : 'Validate Coordinates'}
+            </Button>
           </div>
-
-          {/* Locations List */}
-          <div className="locations-list">
-            <h3>Nearby Locations</h3>
-            {sortedLocations.map(location => (
-              <div
-                key={location.id}
-                className={`location-item ${location.discovered ? 'discovered' : ''} ${
-                  selectedLocation === location.id ? 'selected' : ''
-                }`}
-              >
-                <div className="location-header">
-                  <span className="location-icon">
-                    {location.discovered ? '✓' : '★'}
-                  </span>
-                  <h4>{location.name}</h4>
-                </div>
-                <div className="location-details">
-                  <span className="location-points">{location.points} pts</span>
-                  {location.distance !== undefined && (
-                    <span className="location-distance">
-                      {formatDistance(location.distance)}
-                    </span>
-                  )}
-                  {location.canCheckIn && !location.discovered && (
-                    <span className="location-badge">In Range!</span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </aside>
+        </Card>
       </div>
 
-      <style>{`
-        .map-test {
-          min-height: 100vh;
-          background: #f9fafb;
-        }
+      {enhancementResult && (
+        <Card className="mt-6">
+          <h2 className="text-xl font-semibold mb-4">AI Enhancement Results</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <h3 className="font-medium mb-2">Coordinate Enhancement</h3>
+              {enhancementResult.refinedCoordinates ? (
+                <div>
+                  <p>New: {enhancementResult.refinedCoordinates.lat}, {enhancementResult.refinedCoordinates.lng}</p>
+                  <p>Confidence: {(enhancementResult.confidenceScore * 100).toFixed(1)}%</p>
+                </div>
+              ) : (
+                <p>No coordinate enhancement</p>
+              )}
+            </div>
+            
+            <div>
+              <h3 className="font-medium mb-2">Description Enhancement</h3>
+              {enhancementResult.enhancedDescription ? (
+                <p className="text-sm">{enhancementResult.enhancedDescription.substring(0, 100)}...</p>
+              ) : (
+                <p>No description enhancement</p>
+              )}
+            </div>
 
-        .map-test-header {
-          background: white;
-          padding: 20px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
+            <div>
+              <h3 className="font-medium mb-2">Cultural Context</h3>
+              {enhancementResult.culturalContext ? (
+                <p className="text-sm">{enhancementResult.culturalContext.substring(0, 100)}...</p>
+              ) : (
+                <p>No cultural context</p>
+              )}
+            </div>
 
-        .map-test-header h1 {
-          margin: 0;
-          font-size: 24px;
-          color: #1f2937;
-        }
+            <div>
+              <h3 className="font-medium mb-2">Suggested Radius</h3>
+              {enhancementResult.suggestedRadius ? (
+                <p>{enhancementResult.suggestedRadius} meters</p>
+              ) : (
+                <p>No radius suggestion</p>
+              )}
+            </div>
+          </div>
+        </Card>
+      )}
 
-        .map-test-score {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          padding: 8px 16px;
-          background: #3b82f6;
-          color: white;
-          border-radius: 8px;
-          font-weight: 600;
-        }
-
-        .score-value {
-          font-size: 24px;
-        }
-
-        .map-test-grid {
-          display: grid;
-          grid-template-columns: 1fr 400px;
-          gap: 20px;
-          padding: 20px;
-          max-width: 1600px;
-          margin: 0 auto;
-        }
-
-        .map-test-main {
-          background: white;
-          border-radius: 8px;
-          overflow: hidden;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .map-test-sidebar {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-
-        .status-card {
-          background: white;
-          padding: 16px;
-          border-radius: 8px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .status-card h3 {
-          margin: 0 0 12px 0;
-          font-size: 16px;
-          color: #1f2937;
-        }
-
-        .status-info p {
-          margin: 4px 0;
-          font-size: 14px;
-          color: #4b5563;
-        }
-
-        .status-loading {
-          color: #3b82f6;
-        }
-
-        .status-error {
-          color: #ef4444;
-          font-size: 14px;
-        }
-
-        .btn-refresh {
-          margin-top: 12px;
-          width: 100%;
-          padding: 8px;
-          background: #3b82f6;
-          color: white;
-          border: none;
-          border-radius: 6px;
-          font-size: 14px;
-          font-weight: 500;
-          cursor: pointer;
-        }
-
-        .btn-refresh:hover {
-          background: #2563eb;
-        }
-
-        .stats-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 12px;
-        }
-
-        .stat-item {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          padding: 12px;
-          background: #f3f4f6;
-          border-radius: 6px;
-        }
-
-        .stat-value {
-          font-size: 24px;
-          font-weight: 700;
-          color: #3b82f6;
-        }
-
-        .stat-label {
-          font-size: 12px;
-          color: #6b7280;
-          text-transform: uppercase;
-        }
-
-        .locations-list {
-          background: white;
-          padding: 16px;
-          border-radius: 8px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          max-height: 500px;
-          overflow-y: auto;
-        }
-
-        .locations-list h3 {
-          margin: 0 0 12px 0;
-          font-size: 16px;
-          color: #1f2937;
-        }
-
-        .location-item {
-          padding: 12px;
-          margin-bottom: 8px;
-          border-radius: 6px;
-          background: #f9fafb;
-          border: 2px solid transparent;
-          transition: all 0.2s;
-        }
-
-        .location-item:hover {
-          background: #f3f4f6;
-        }
-
-        .location-item.discovered {
-          background: #d1fae5;
-          border-color: #10b981;
-        }
-
-        .location-item.selected {
-          border-color: #3b82f6;
-        }
-
-        .location-header {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin-bottom: 8px;
-        }
-
-        .location-icon {
-          font-size: 20px;
-        }
-
-        .location-header h4 {
-          margin: 0;
-          font-size: 14px;
-          font-weight: 600;
-          color: #1f2937;
-        }
-
-        .location-details {
-          display: flex;
-          gap: 8px;
-          align-items: center;
-          font-size: 12px;
-        }
-
-        .location-points {
-          padding: 2px 8px;
-          background: #dbeafe;
-          color: #1e40af;
-          border-radius: 4px;
-          font-weight: 500;
-        }
-
-        .location-distance {
-          color: #6b7280;
-        }
-
-        .location-badge {
-          padding: 2px 8px;
-          background: #10b981;
-          color: white;
-          border-radius: 4px;
-          font-weight: 500;
-        }
-
-        @media (max-width: 1024px) {
-          .map-test-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .map-test-sidebar {
-            order: -1;
-          }
-        }
-
-        @media (prefers-color-scheme: dark) {
-          .map-test {
-            background: #111827;
-          }
-
-          .map-test-header,
-          .status-card,
-          .locations-list,
-          .map-test-main {
-            background: #1f2937;
-          }
-
-          .map-test-header h1,
-          .status-card h3,
-          .locations-list h3,
-          .location-header h4 {
-            color: #f9fafb;
-          }
-
-          .status-info p {
-            color: #d1d5db;
-          }
-
-          .location-item {
-            background: #374151;
-          }
-
-          .location-item:hover {
-            background: #4b5563;
-          }
-
-          .stat-item {
-            background: #374151;
-          }
-        }
-      `}</style>
+      {validationResult && (
+        <Card className="mt-6">
+          <h2 className="text-xl font-semibold mb-4">Coordinate Validation Results</h2>
+          <div className="space-y-2">
+            <p><strong>Valid:</strong> {validationResult.isValid ? 'Yes' : 'No'}</p>
+            <p><strong>Confidence:</strong> {(validationResult.confidence * 100).toFixed(1)}%</p>
+            {validationResult.suggestedCorrection && (
+              <p>
+                <strong>Suggested Correction:</strong> 
+                {validationResult.suggestedCorrection.lat}, {validationResult.suggestedCorrection.lng}
+              </p>
+            )}
+          </div>
+        </Card>
+      )}
     </div>
   );
 }
