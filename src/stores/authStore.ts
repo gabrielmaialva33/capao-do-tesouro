@@ -131,14 +131,15 @@ export const authActions = {
    * Call this once when the app starts to subscribe to auth state changes
    */
   initializeAuthListener: (): (() => void) => {
-    const { setUser, setLoading } = useAuthStore.getState();
+    const { setUser } = useAuthStore.getState();
 
-    setLoading(true);
+    // Don't set loading to true here - it causes issues when multiple
+    // components call useAuth() and re-initialize the listener
+    // The store already starts with loading: true
 
     const unsubscribe = onAuthStateChange((user) => {
       console.log('Auth state changed:', user ? 'Logged in' : 'Logged out');
       setUser(user);
-      setLoading(false); // Sempre seta loading false após receber estado
     });
 
     return unsubscribe;

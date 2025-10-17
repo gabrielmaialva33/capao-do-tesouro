@@ -4,9 +4,10 @@
  * Configures application routes and authentication flow
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
+import { authActions } from './stores/authStore';
 
 // Pages
 import HomePage from './pages/HomePage';
@@ -27,6 +28,12 @@ import './App.css';
 function App() {
   const { isAuthenticated, loading } = useAuth();
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
+
+  // Initialize auth listener once when app starts
+  useEffect(() => {
+    const unsubscribe = authActions.initializeAuthListener();
+    return () => unsubscribe();
+  }, []);
 
   // Show loading screen while checking authentication
   if (loading) {
