@@ -13,6 +13,7 @@ import { authActions } from './stores/authStore';
 import HomePage from './pages/HomePage';
 import MapPage from './pages/MapPage';
 import NotFoundPage from './pages/NotFoundPage';
+import ThreeDemoPage from './pages/ThreeDemoPage';
 
 // Auth Pages
 import LoginPage from './features/auth/LoginPage';
@@ -104,6 +105,16 @@ function App() {
           element={
             <ProtectedRoute>
               <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Three.js Demo Route */}
+        <Route
+          path="/three-demo"
+          element={
+            <ProtectedRoute>
+              <ThreeDemoPage />
             </ProtectedRoute>
           }
         />

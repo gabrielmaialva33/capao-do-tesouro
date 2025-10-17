@@ -43,54 +43,71 @@ export default function HomePage() {
         </header>
 
         {/* Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/map')}>
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-3xl">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <Card class="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/map')}>
+            <div class="text-center">
+              <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-3xl">
                 🗺️
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 Explorar Mapa
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <p class="text-gray-600 dark:text-gray-400 mb-4">
                 Descubra tesouros escondidos pelo mapa da cidade
               </p>
-              <Button variant="primary" className="w-full">
+              <Button variant="primary" class="w-full">
                 Abrir Mapa
               </Button>
             </div>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/quests')}>
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-secondary to-secondary/80 rounded-full flex items-center justify-center text-3xl">
+          <Card class="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/quests')}>
+            <div class="text-center">
+              <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-secondary to-secondary/80 rounded-full flex items-center justify-center text-3xl">
                 ⭐
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 Missões
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <p class="text-gray-600 dark:text-gray-400 mb-4">
                 Complete missões e ganhe recompensas incríveis
               </p>
-              <Button variant="secondary" className="w-full">
+              <Button variant="secondary" class="w-full">
                 Ver Missões
               </Button>
             </div>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/leaderboard')}>
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-accent to-accent/80 rounded-full flex items-center justify-center text-3xl">
+          <Card class="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/leaderboard')}>
+            <div class="text-center">
+              <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-accent to-accent/80 rounded-full flex items-center justify-center text-3xl">
                 🏆
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 Ranking
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <p class="text-gray-600 dark:text-gray-400 mb-4">
                 Veja sua posição entre os melhores jogadores
               </p>
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" class="w-full">
                 Ver Ranking
+              </Button>
+            </div>
+          </Card>
+
+          <Card class="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/three-demo')}>
+            <div class="text-center">
+              <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-3xl">
+                🎮
+              </div>
+              <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                Demo 3D
+              </h3>
+              <p class="text-gray-600 dark:text-gray-400 mb-4">
+                Experimente a nova experiência 3D imersiva
+              </p>
+              <Button variant="outline" class="w-full">
+                Ver Demo
               </Button>
             </div>
           </Card>
