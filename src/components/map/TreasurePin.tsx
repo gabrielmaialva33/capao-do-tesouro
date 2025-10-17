@@ -290,6 +290,35 @@ export function TreasurePin({
           opacity: 0.6;
         }
 
+        .treasure-popup-confidence {
+          margin-bottom: 12px;
+          padding: 8px;
+          background: #f8fafc;
+          border-radius: 6px;
+          border: 1px solid #e2e8f0;
+        }
+
+        .treasure-popup-confidence-bar {
+          width: 100%;
+          height: 6px;
+          background: #e2e8f0;
+          border-radius: 3px;
+          overflow: hidden;
+          margin-bottom: 4px;
+        }
+
+        .treasure-popup-confidence-fill {
+          height: 100%;
+          transition: width 0.3s ease;
+        }
+
+        .treasure-popup-confidence-text {
+          font-size: 12px;
+          color: #64748b;
+          text-align: center;
+          font-weight: 500;
+        }
+
         @media (prefers-color-scheme: dark) {
           .treasure-popup-title {
             color: #f9fafb;
@@ -309,6 +338,19 @@ export function TreasurePin({
 
           .treasure-popup-value {
             color: #f9fafb;
+          }
+
+          .treasure-popup-confidence {
+            background: #1e293b;
+            border-color: #334155;
+          }
+
+          .treasure-popup-confidence-bar {
+            background: #334155;
+          }
+
+          .treasure-popup-confidence-text {
+            color: #94a3b8;
           }
         }
       `}</style>
