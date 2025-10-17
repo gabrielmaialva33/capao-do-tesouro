@@ -99,7 +99,11 @@ export function LeafletMap({
 
   // Update map center when user position is available
   useEffect(() => {
-    if (position && !center) {
+    if (position && !center &&
+        typeof position.coords.latitude === 'number' &&
+        typeof position.coords.longitude === 'number' &&
+        !isNaN(position.coords.latitude) &&
+        !isNaN(position.coords.longitude)) {
       const newCenter: L.LatLngExpression = [
         position.coords.latitude,
         position.coords.longitude,
@@ -241,7 +245,11 @@ export function LeafletMap({
           maxZoom={19}
         />
 
-        {showUserMarker && userPosition && (
+        {showUserMarker && userPosition &&
+         typeof userPosition.lat === 'number' &&
+         typeof userPosition.lng === 'number' &&
+         !isNaN(userPosition.lat) &&
+         !isNaN(userPosition.lng) && (
           <UserMarker
             lat={userPosition.lat}
             lng={userPosition.lng}
@@ -250,15 +258,22 @@ export function LeafletMap({
           />
         )}
 
-        {locationsWithDistance.map(location => (
-          <TreasurePin
-            key={location.id}
-            location={location}
-            onCheckIn={onLocationClick}
-            disabled={!location.canCheckIn}
-            distance={location.distance}
-          />
-        ))}
+        {locationsWithDistance
+          .filter(loc =>
+            typeof loc.lat === 'number' &&
+            typeof loc.lng === 'number' &&
+            !isNaN(loc.lat) &&
+            !isNaN(loc.lng)
+          )
+          .map(location => (
+            <TreasurePin
+              key={location.id}
+              location={location}
+              onCheckIn={onLocationClick}
+              disabled={!location.canCheckIn}
+              distance={location.distance}
+            />
+          ))}
       </MapContainer>
 
       <style>{`
